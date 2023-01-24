@@ -1,6 +1,6 @@
 package com.team4.myapp.attendance.model.dto;
 
-import java.sql.Timestamp;
+import java.util.Date;
 
 import com.team4.myapp.attendance.model.Attendance;
 
@@ -14,8 +14,8 @@ import lombok.ToString;
 @ToString
 @AllArgsConstructor
 public class CalendarDto {
-	private Timestamp start;
-	private Timestamp end;
+	private Date start;
+	private Date end;
 	private String title;
 	private String id;
 	private int attendanceStatus;
@@ -31,7 +31,7 @@ public class CalendarDto {
 		String color = "";
 		String url = null;
 		int aStatus = attendance.getAttendanceStatus();
-		System.out.println(attendance.getSubmitStatus());
+		System.out.println(attendance.getAttendanceDate());
 
 		switch (aStatus) {
 		case 0:
@@ -51,11 +51,14 @@ public class CalendarDto {
 			color = "#FFAB76";
 			break;
 		}
+		
+		// 승인된 사유라면 출석버튼과 동일한 색상으로 처리
+		if(attendance.getSubmitStatus() == 2) color = "#47D99E";
 
 		if(attendance.getAttendanceStatus() == 1) url = "/attendance/main";
 		else if(attendance.getAttendanceStatus() != 1 && attendance.getSubmitStatus() == 0) {
 			// 작성페이지
-			url = "/cause/write";
+			url = "/cause/write?attendanceId=" + attendance.getAttendanceId();
 		} 
 		else if(attendance.getAttendanceStatus() != 1 && (attendance.getSubmitStatus() == 2 
 				|| attendance.getSubmitStatus() == 3)) {
@@ -66,6 +69,10 @@ public class CalendarDto {
 			// 수정페이지
 			url = "/cause/update/0?attendanceId=" + attendance.getAttendanceId();
 		}  
+		
+		if(attendance.getCheckIn() == null && attendance.getCheckOut() == null) return  new CalendarDto(attendance.getAttendanceDate(), attendance.getAttendanceDate(), "-", attendance.getAttendanceId()+"",
+				attendance.getAttendanceStatus(), attendance.getSubmitStatus(), attendance.getMemberName(), attendance.getLectureId(), color, color, url);
+		
 		return new CalendarDto(attendance.getCheckIn(), attendance.getCheckOut(), status, attendance.getAttendanceId()+"",
 				attendance.getAttendanceStatus(), attendance.getSubmitStatus(), attendance.getMemberName(), attendance.getLectureId(), color, color, url);
 

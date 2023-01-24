@@ -125,7 +125,7 @@ public class AttendanceService implements IAttendanceService {
 		boolean result = calWorkingTime(memberId, null, null);
 
 		// 근무시간 미달 여부 검사
-		if (!result) {
+		if (!result) {	
 			attendanceRepository.updateCheckOut(memberId, 0, today);
 		} else
 			attendanceRepository.updateCheckOut(memberId, -1, today);
@@ -231,9 +231,9 @@ public class AttendanceService implements IAttendanceService {
 				if (!result) { // 출근 시간 미달인 경우 그 상태만 수정한다.
 					System.out.println(" 미달 ~~~~~~");
 					attendanceRepository.updateAttendanceStatusById(null, 0, mid, today); // 결석 처리
-				} else {
+				} /*else {
 					attendanceRepository.updateAttendanceStatusById(null, -1, mid, today); // 가존 상태 유지
-				}
+				}*/
 
 			} catch (ParseException e) {
 				e.printStackTrace();
@@ -256,7 +256,9 @@ public class AttendanceService implements IAttendanceService {
 	@Override
 	public void insertToday(List<Statistics> mlist, String yesterday, String year, String month) {
 		for(Statistics memberStatus : mlist) {
-			attendanceRepository.insertToday(memberStatus.getMemberId(), memberStatus.getAttendanceStatus(), yesterday, year, month);
+			// 승인된 사유면 출석 +1
+			if(memberStatus.getSubmitStatus() == 2) attendanceRepository.insertToday(memberStatus.getMemberId(),1 , yesterday, year, month);		
+			else attendanceRepository.insertToday(memberStatus.getMemberId(), memberStatus.getAttendanceStatus(), yesterday, year, month);
 		}	
 	}
 	// 이달의 출석 통계 가져오기

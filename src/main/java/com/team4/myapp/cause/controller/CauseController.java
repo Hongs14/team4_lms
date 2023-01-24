@@ -4,13 +4,11 @@ import java.nio.charset.Charset;
 import java.util.Date;
 import java.util.List;
 
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -151,12 +149,14 @@ public class CauseController {
 		return cdlist;
 	}
 	
+	@Auth(role = Role.PROFESSOR)
 	@RequestMapping(value="/cause/admin/accept", method=RequestMethod.POST)
 	public String accept(CauseListDto cause, int page) {	
 		causeService.accept(cause.getCauseId(),cause.getCauseStatus());
 		return "redirect:/cause/admin/list/"+page;
 	}
 	
+	@Auth(role = Role.PROFESSOR)
 	@RequestMapping(value="/cause/admin/date/{page}", method = RequestMethod.GET)
 	public String selectCauseListAdminDate(@PathVariable int page, String keyword, HttpSession session, Model model) {
 		//리스트 불러오기
@@ -214,7 +214,7 @@ public class CauseController {
 	}
 	
 	@RequestMapping(value="/cause/update", method=RequestMethod.POST)
-	public String updateCause(Cause cause, HttpSession session, RedirectAttributes redurectAttrs) {
+	public String updateCause(Cause cause, HttpSession session) {
 		logger.info("/cause/update : "+ cause.toString());
 	
 		causeService.updateCause(cause);
